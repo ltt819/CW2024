@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import javafx.scene.Group;
+import javafx.application.Platform;
 
 public class LevelViewLevelTwo extends LevelView {
 
@@ -17,7 +18,10 @@ public class LevelViewLevelTwo extends LevelView {
 	}
 	
 	private void addImagesToRoot() {
-		root.getChildren().addAll(shieldImage);
+		Platform.runLater(() -> {
+			getRoot().getChildren().add(shieldImage.getShieldImageView());
+			System.out.println("Children in root: " + getRoot().getChildren().size());
+		});
 	}
 	
 	public void showShield() {
