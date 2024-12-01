@@ -1,6 +1,11 @@
 package com.example.demo;
 
 import java.util.*;
+import javafx.scene.Group;
+import javafx.application.Platform;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Boss extends FighterPlane {
 
@@ -24,8 +29,9 @@ public class Boss extends FighterPlane {
 	private int consecutiveMovesInSameDirection;
 	private int indexOfCurrentMove;
 	private int framesWithShieldActivated;
+	private ShieldImage shieldImage;
 
-	public Boss() {
+	public Boss(Group root) {
 		super(IMAGE_NAME, IMAGE_HEIGHT, INITIAL_X_POSITION, INITIAL_Y_POSITION, HEALTH);
 		movePattern = new ArrayList<>();
 		consecutiveMovesInSameDirection = 0;
@@ -33,6 +39,12 @@ public class Boss extends FighterPlane {
 		framesWithShieldActivated = 0;
 		isShielded = false;
 		initializeMovePattern();
+		shieldImage = new ShieldImage(500, 500);
+		Platform.runLater(() -> {
+			root.getChildren().add(shieldImage.getShieldImageView());
+			shieldImage.hideShield();
+			shieldImage.getShieldImageView().toFront();
+		});
 	}
 
 	@Override
@@ -44,18 +56,19 @@ public class Boss extends FighterPlane {
 			setTranslateY(initialTranslateY);
 		}
 	}
-	
+
 	@Override
 	public void updateActor() {
 		updatePosition();
 		updateShield();
+		updateShieldPosition();
 	}
 
 	@Override
 	public ActiveActorDestructible fireProjectile() {
 		return bossFiresInCurrentFrame() ? new BossProjectile(getProjectileInitialPosition()) : null;
 	}
-	
+
 	@Override
 	public void takeDamage() {
 		if (!isShielded) {
@@ -74,8 +87,21 @@ public class Boss extends FighterPlane {
 
 	private void updateShield() {
 		if (isShielded) framesWithShieldActivated++;
-		else if (shieldShouldBeActivated()) activateShield();	
+		else if (shieldShouldBeActivated()) activateShield();
 		if (shieldExhausted()) deactivateShield();
+	}
+
+	private void updateShieldPosition() {
+
+			double bossX = getLayoutX() + getTranslateX();
+			double bossY = getLayoutY() + getTranslateY();
+
+			double shieldOffsetX = (IMAGE_HEIGHT - ShieldImage.SHIELD_SIZE) / 2;
+			double shieldOffsetY = (IMAGE_HEIGHT - ShieldImage.SHIELD_SIZE) / 2;
+
+			shieldImage.setPosition(bossX + shieldOffsetX, bossY + shieldOffsetY);
+
+
 	}
 
 	private int getNextMove() {
@@ -110,11 +136,13 @@ public class Boss extends FighterPlane {
 
 	private void activateShield() {
 		isShielded = true;
+		shieldImage.showShield();
 	}
 
 	private void deactivateShield() {
 		isShielded = false;
 		framesWithShieldActivated = 0;
-	}
+		shieldImage.hideShield();
 
+	}
 }

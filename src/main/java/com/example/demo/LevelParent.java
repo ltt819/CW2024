@@ -215,6 +215,15 @@ public abstract class LevelParent extends Observable {
 		levelView.showGameOverImage();
 	}
 
+	public void cleanUp() {
+		timeline.stop();
+		root.getChildren().clear();
+		friendlyUnits.clear();
+		enemyUnits.clear();
+		userProjectiles.clear();
+		enemyProjectiles.clear();
+	}
+
 	protected UserPlane getUser() {
 		return user;
 	}

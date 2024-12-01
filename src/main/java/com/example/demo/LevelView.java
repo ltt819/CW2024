@@ -21,7 +21,11 @@ public class LevelView {
 		this.winImage = new WinImage(WIN_IMAGE_X_POSITION, WIN_IMAGE_Y_POSITION);
 		this.gameOverImage = new GameOverImage(LOSS_SCREEN_X_POSITION, LOSS_SCREEN_Y_POSISITION);
 	}
-	
+
+	protected Group getRoot() {
+		return root;
+	}
+
 	public void showHeartDisplay() {
 		root.getChildren().add(heartDisplay.getContainer());
 	}
