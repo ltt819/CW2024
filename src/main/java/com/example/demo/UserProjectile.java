@@ -18,6 +18,9 @@ public class UserProjectile extends Projectile {
 	@Override
 	public void updateActor() {
 		updatePosition();
+		if (getLayoutX() > 1300 || getLayoutX() < 0) { 
+			this.destroy();
+		}
 	}
 	
 }

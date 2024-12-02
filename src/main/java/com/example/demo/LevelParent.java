@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import javafx.animation.*;
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.*;
@@ -174,6 +175,8 @@ public abstract class LevelParent extends Observable {
 			List<ActiveActorDestructible> actors2) {
 		for (ActiveActorDestructible actor : actors2) {
 			for (ActiveActorDestructible otherActor : actors1) {
+				Bounds actorBounds = actor.getBoundsInParent();
+				Bounds otherBounds = otherActor.getBoundsInParent();
 				if (actor.getBoundsInParent().intersects(otherActor.getBoundsInParent())) {
 					actor.takeDamage();
 					otherActor.takeDamage();
