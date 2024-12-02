@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import java.lang.reflect.InvocationTargetException;
 
+import com.example.demo.StartMenu;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -15,12 +16,14 @@ public class Main extends Application {
 	@Override
 	public void start(Stage stage) throws ClassNotFoundException, NoSuchMethodException, SecurityException,
 			InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		StartMenu startMenu = new StartMenu(stage);
 		stage.setTitle(TITLE);
 		stage.setResizable(false);
 		stage.setHeight(SCREEN_HEIGHT);
 		stage.setWidth(SCREEN_WIDTH);
-		myController = new Controller(stage);
-		myController.launchGame();
+		stage.setScene(startMenu.getScene());
+		stage.setTitle("Sky Battle");
+		stage.show();
 	}
 
 	public static void main(String[] args) {
