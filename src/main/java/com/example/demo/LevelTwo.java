@@ -23,7 +23,7 @@ public class LevelTwo extends LevelParent {
 			loseGame();
 		}
 		else if (boss.isDestroyed()) {
-			winGame();
+			notifyObservers("com.example.demo.LevelThree");
 		}
 	}
 

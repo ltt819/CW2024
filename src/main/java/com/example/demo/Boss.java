@@ -143,6 +143,5 @@ public class Boss extends FighterPlane {
 		isShielded = false;
 		framesWithShieldActivated = 0;
 		shieldImage.hideShield();
-
 	}
 }

@@ -10,6 +10,8 @@ public class EnemyPlane extends FighterPlane {
 	private static final int INITIAL_HEALTH = 1;
 	private static final double FIRE_RATE = .01;
 
+	private boolean fireEnabled = true;
+
 	public EnemyPlane(double initialXPos, double initialYPos) {
 		super(IMAGE_NAME, IMAGE_HEIGHT, initialXPos, initialYPos, INITIAL_HEALTH);
 	}
@@ -21,6 +23,11 @@ public class EnemyPlane extends FighterPlane {
 
 	@Override
 	public ActiveActorDestructible fireProjectile() {
+
+		if (!fireEnabled) {
+			return null;
+		}
+
 		if (Math.random() < FIRE_RATE) {
 			double projectileXPosition = getProjectileXPosition(PROJECTILE_X_POSITION_OFFSET);
 			double projectileYPostion = getProjectileYPosition(PROJECTILE_Y_POSITION_OFFSET);
@@ -34,4 +41,13 @@ public class EnemyPlane extends FighterPlane {
 		updatePosition();
 	}
 
+	// 新增方法：设置是否允许发射子弹
+	public void setFireEnabled(boolean fireEnabled) {
+		this.fireEnabled = fireEnabled;
+	}
+
+	// 新增方法：获取当前的发射状态
+	public boolean isFireEnabled() {
+		return fireEnabled;
+	}
 }

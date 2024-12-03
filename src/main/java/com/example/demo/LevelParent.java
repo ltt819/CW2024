@@ -138,7 +138,7 @@ public abstract class LevelParent extends Observable {
 		}
 	}
 
-	private void updateActors() {
+	protected void updateActors() {
 		friendlyUnits.forEach(plane -> plane.updateActor());
 		enemyUnits.forEach(enemy -> enemy.updateActor());
 		userProjectiles.forEach(projectile -> projectile.updateActor());
@@ -248,6 +248,10 @@ public abstract class LevelParent extends Observable {
 		return enemyMaximumYPosition;
 	}
 
+	public double getScreenHeight() {
+		return screenHeight;
+	}
+
 	protected double getScreenWidth() {
 		return screenWidth;
 	}
@@ -258,6 +262,11 @@ public abstract class LevelParent extends Observable {
 
 	private void updateNumberOfEnemies() {
 		currentNumberOfEnemies = enemyUnits.size();
+	}
+
+	protected void notifyObservers(String nextLevelClassName) {
+		setChanged();
+		super.notifyObservers(nextLevelClassName); // 通知观察者
 	}
 
 }
