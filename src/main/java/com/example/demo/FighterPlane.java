@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import java.util.Observable;
+
 public abstract class FighterPlane extends ActiveActorDestructible {
 
 	private int health;
@@ -17,6 +19,7 @@ public abstract class FighterPlane extends ActiveActorDestructible {
 		if (healthAtZero()) {
 			this.destroy();
 		}
+
 	}
 
 	protected double getProjectileXPosition(double xPositionOffset) {

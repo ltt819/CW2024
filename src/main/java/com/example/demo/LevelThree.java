@@ -11,10 +11,13 @@ public class LevelThree extends LevelParent {
     public LevelThree(double screenHeight, double screenWidth) {
         super(BACKGROUND_IMAGE_NAME, screenHeight, screenWidth, PLAYER_INITIAL_HEALTH);
 
+        initializeLevelTitle("Level Three");
         // 初始化 Boss
         this.boss = new Boss(getRoot());
         this.boss.setLayoutX(1000); // 设置 Boss 的初始位置
         this.boss.setLayoutY(400);
+        // 初始化 Boss 血条
+        initializeBossHealthBar(boss, boss.getHealth());
     }
 
     @Override

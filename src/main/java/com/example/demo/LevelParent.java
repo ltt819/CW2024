@@ -11,6 +11,12 @@ import javafx.scene.Scene;
 import javafx.scene.image.*;
 import javafx.scene.input.*;
 import javafx.util.Duration;
+import javafx.scene.control.Label;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.Pane;
+import javafx.scene.control.ProgressBar;
 
 public abstract class LevelParent extends Observable {
 
@@ -33,6 +39,13 @@ public abstract class LevelParent extends Observable {
 	
 	private int currentNumberOfEnemies;
 	private LevelView levelView;
+
+	private static final int TITLE_FONT_SIZE = 30; // 字体大小
+	private Label levelTitle; // 用于显示关卡名称的标签
+
+	private ProgressBar bossHealthBar;
+	private ActiveActorDestructible boss; // 通用的 Boss 引用
+	private double bossMaxHealth;
 
 	public LevelParent(String backgroundImageName, double screenHeight, double screenWidth, int playerInitialHealth) {
 		this.root = new Group();
@@ -118,7 +131,7 @@ public abstract class LevelParent extends Observable {
 				if (kc == KeyCode.UP || kc == KeyCode.DOWN) user.stop();
 			}
 		});
-		root.getChildren().add(background);
+		root.getChildren().add(0,background);
 	}
 
 	private void fireProjectile() {
@@ -143,6 +156,8 @@ public abstract class LevelParent extends Observable {
 		enemyUnits.forEach(enemy -> enemy.updateActor());
 		userProjectiles.forEach(projectile -> projectile.updateActor());
 		enemyProjectiles.forEach(projectile -> projectile.updateActor());
+		// 更新 Boss 的血条状态
+		updateBossHealth();
 	}
 
 	private void removeAllDestroyedActors() {
@@ -171,15 +186,12 @@ public abstract class LevelParent extends Observable {
 		handleCollisions(enemyProjectiles, friendlyUnits);
 	}
 
-	private void handleCollisions(List<ActiveActorDestructible> actors1,
-			List<ActiveActorDestructible> actors2) {
-		for (ActiveActorDestructible actor : actors2) {
-			for (ActiveActorDestructible otherActor : actors1) {
-				Bounds actorBounds = actor.getBoundsInParent();
-				Bounds otherBounds = otherActor.getBoundsInParent();
-				if (actor.getBoundsInParent().intersects(otherActor.getBoundsInParent())) {
-					actor.takeDamage();
-					otherActor.takeDamage();
+	private void handleCollisions(List<ActiveActorDestructible> projectiles, List<ActiveActorDestructible> targets) {
+		for (ActiveActorDestructible target : targets) {
+			for (ActiveActorDestructible projectile : projectiles) {
+				if (projectile.getBoundsInParent().intersects(target.getBoundsInParent())) {
+					projectile.takeDamage(); // 子弹销毁
+					target.takeDamage(); // Boss 或敌机受到伤害
 				}
 			}
 		}
@@ -269,4 +281,42 @@ public abstract class LevelParent extends Observable {
 		super.notifyObservers(nextLevelClassName); // 通知观察者
 	}
 
+	// 添加方法：初始化顶部关卡名称
+	protected void initializeLevelTitle(String levelName) {
+		levelTitle = new Label(levelName);
+		levelTitle.setFont(new Font("Arial", TITLE_FONT_SIZE)); // 设置字体和大小
+		levelTitle.setTextAlignment(TextAlignment.CENTER);
+		levelTitle.setStyle("-fx-text-fill: white;"); // 设置文字颜色
+		levelTitle.setLayoutX((screenWidth - levelTitle.prefWidth(-1)) / 2); // 水平居中
+		levelTitle.setLayoutY(20); // 设置距离顶部的偏移
+		root.getChildren().add(levelTitle); // 添加到根节点
+	}
+
+	// 初始化 Boss 血条
+	protected void initializeBossHealthBar(ActiveActorDestructible boss, double initialHealth) {
+		this.boss = boss;
+		bossMaxHealth = initialHealth; // 记录 Boss 最大血量
+		bossHealthBar = new ProgressBar(1.0); // 初始进度为 100%
+		bossHealthBar.setPrefWidth(200); // 设置血条宽度
+		bossHealthBar.setLayoutX(screenWidth - 220); // 右上角布局
+		bossHealthBar.setLayoutY(20); // 距离顶部的偏移
+		root.getChildren().add(bossHealthBar); // 添加到根节点
+	}
+
+	// 更新 Boss 血条
+	private void updateBossHealth() {
+		if (boss != null && bossHealthBar != null) {
+			double currentHealth = ((FighterPlane) boss).getHealth();
+			double progress = Math.max(0, currentHealth / bossMaxHealth);
+			bossHealthBar.setProgress(progress);
+			// 根据血量比例设置血条颜色
+			if (progress > 0.5) {
+				bossHealthBar.setStyle("-fx-accent: green;");  // 绿色
+			} else if (progress > 0.2) {
+				bossHealthBar.setStyle("-fx-accent: yellow;");  // 黄色
+			} else {
+				bossHealthBar.setStyle("-fx-accent: red;");  // 红色
+			}
+		}
+	}
 }

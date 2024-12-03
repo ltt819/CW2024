@@ -30,6 +30,7 @@ public class Boss extends FighterPlane {
 	private int indexOfCurrentMove;
 	private int framesWithShieldActivated;
 	private ShieldImage shieldImage;
+	private int health;
 
 	public Boss(Group root) {
 		super(IMAGE_NAME, IMAGE_HEIGHT, INITIAL_X_POSITION, INITIAL_Y_POSITION, HEALTH);
@@ -45,6 +46,7 @@ public class Boss extends FighterPlane {
 			shieldImage.hideShield();
 			shieldImage.getShieldImageView().toFront();
 		});
+		this.health = 100;  // 初始化血量为 100
 	}
 
 	@Override
@@ -74,6 +76,22 @@ public class Boss extends FighterPlane {
 		if (!isShielded) {
 			super.takeDamage();
 		}
+		if (health > 0) {
+			health--;
+			System.out.println("Boss Health: " + health);
+		}else {
+			System.out.println("Boss is already destroyed!");
+		}
+	}
+
+	public void setHealth(int newHealth) {
+		this.health = Math.max(newHealth, 0); // 确保血量不会为负数
+	}
+
+
+	// 获取当前血量
+	public int getHealth() {
+		return super.getHealth(); // 通过父类方法获取当前血量
 	}
 
 	private void initializeMovePattern() {
