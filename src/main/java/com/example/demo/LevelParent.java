@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import javafx.animation.*;
 import javafx.event.EventHandler;
-import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.*;
@@ -15,8 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.layout.Pane;
-import javafx.scene.control.ProgressBar;
+import javafx.scene.input.KeyCode;
 
 public abstract class LevelParent extends Observable {
 
@@ -47,6 +45,11 @@ public abstract class LevelParent extends Observable {
 	private ProgressBar bossHealthBar;
 	private ActiveActorDestructible boss; // 通用的 Boss 引用
 	private double bossMaxHealth;
+
+	private boolean isPaused = false;
+	private ImageView pauseBackground;
+	private Label pauseLabel1;
+	private Label pauseLabel2;
 
 	public LevelParent(String backgroundImageName, double screenHeight, double screenWidth, int playerInitialHealth) {
 		this.root = new Group();
@@ -80,6 +83,7 @@ public abstract class LevelParent extends Observable {
 		initializeBackground();
 		initializeFriendlyUnits();
 		levelView.showHeartDisplay();
+		initializeKeyListeners(); // 初始化键盘监听（用来暂停和恢复游戏）
 		return scene;
 	}
 
@@ -87,6 +91,94 @@ public abstract class LevelParent extends Observable {
 		background.requestFocus();
 		timeline.play();
 	}
+
+	// 添加暂停和恢复的功能
+	public void togglePause() {
+		if (isPaused) {
+			resumeGame();  // 恢复游戏
+		} else {
+			pauseGame();  // 暂停游戏
+		}
+	}
+
+	// 暂停游戏
+	private void pauseGame() {
+		isPaused = true;
+		timeline.pause();  // 暂停时间线
+		showPauseText();  // 显示暂停文字
+		disableGameInput();  // 禁用游戏输入
+	}
+
+	// 恢复游戏
+	private void resumeGame() {
+		isPaused = false;
+		timeline.play();  // 恢复时间线
+		removePauseText();  // 移除暂停文字
+		enableGameInput();  // 恢复游戏输入
+	}
+
+	private void disableGameInput() {
+		// 仅禁用除 ESC 键外的其他输入
+		scene.setOnKeyPressed(event -> {
+			if (event.getCode() != KeyCode.ESCAPE) {
+				event.consume();  // 忽略其他键盘输入
+			} else {
+			// 让 ESC 键处理暂停和恢复
+			togglePause();
+			}
+		});
+	}
+
+	private void enableGameInput() {
+		// 恢复游戏输入（除了 ESC）
+		scene.setOnKeyPressed(event -> {
+			if (event.getCode() == KeyCode.ESCAPE) {
+				togglePause();  // 切换暂停状态
+			}
+		});
+	}
+
+	private void showPauseText() {
+		// 创建暂停文字
+		pauseLabel1 = new Label("The game is paused");
+		pauseLabel1.setFont(new Font("Arial", 40));
+		pauseLabel1.setStyle("-fx-text-fill: white;");
+		pauseLabel1.setTextAlignment(TextAlignment.CENTER);
+		pauseLabel1.setLayoutX((screenWidth - 400) / 2);  // 水平居中
+		pauseLabel1.setLayoutY(screenHeight / 2 - 50);  // 位于屏幕中央
+
+		pauseLabel2 = new Label("Press ESC to return to the game");
+		pauseLabel2.setFont(new Font("Arial", 20));
+		pauseLabel2.setStyle("-fx-text-fill: white;");
+		pauseLabel2.setTextAlignment(TextAlignment.CENTER);
+		pauseLabel2.setLayoutX((screenWidth - 400) / 2);  // 水平居中
+		pauseLabel2.setLayoutY(screenHeight / 2 + 20);  // 位于第一行下方
+
+		// 将暂停文字添加到 root 中
+		root.getChildren().addAll(pauseLabel1, pauseLabel2);
+	}
+
+	private void removePauseText() {
+		if (pauseLabel1 != null) {
+			root.getChildren().remove(pauseLabel1);
+		}
+		if (pauseLabel2 != null) {
+			root.getChildren().remove(pauseLabel2);
+		}
+
+		// 调试输出：检查当前根节点中的所有元素
+		System.out.println("Current root children after removing pause text: " + root.getChildren());
+	}
+
+	// 监听键盘事件，切换暂停状态
+	private void initializeKeyListeners() {
+		scene.setOnKeyPressed(event -> {
+			if (event.getCode() == KeyCode.ESCAPE) {
+				togglePause();
+			}
+		});
+	}
+
 
 	public void goToNextLevel(String levelName) {
 		setChanged();
