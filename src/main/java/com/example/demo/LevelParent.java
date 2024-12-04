@@ -42,6 +42,7 @@ public abstract class LevelParent extends Observable {
 
 	private static final int TITLE_FONT_SIZE = 30; // 字体大小
 	private Label levelTitle; // 用于显示关卡名称的标签
+	private Label hintLabel;
 
 	private ProgressBar bossHealthBar;
 	private ActiveActorDestructible boss; // 通用的 Boss 引用
@@ -223,11 +224,50 @@ public abstract class LevelParent extends Observable {
 	protected void winGame() {
 		timeline.stop();
 		levelView.showWinImage();
+		// 添加提示信息
+		showReturnToStartMenuHint();
+
+		// 捕捉 R 键事件
+		scene.setOnKeyPressed(e -> {
+			if (e.getCode() == KeyCode.R) {
+				returnToStartMenu();
+			}
+		});
 	}
 
 	protected void loseGame() {
 		timeline.stop();
 		levelView.showGameOverImage();
+		// 添加提示信息
+		showReturnToStartMenuHint();
+
+		// 捕捉 R 键事件
+		scene.setOnKeyPressed(e -> {
+			if (e.getCode() == KeyCode.R) {
+				returnToStartMenu();
+			}
+		});
+	}
+
+	// 返回主菜单的方法
+	private void returnToStartMenu() {
+		setChanged();
+		notifyObservers("com.example.demo.StartMenu");
+	}
+
+	// 显示提示信息
+	public void showReturnToStartMenuHint() {
+		Label hintLabel = new Label("Press R to return to the start menu");
+		hintLabel.setFont(new Font("Arial", 20));
+		hintLabel.setStyle("-fx-text-fill: red;");
+		hintLabel.setTextAlignment(TextAlignment.CENTER);
+		hintLabel.setLayoutX((screenWidth - 300) / 2); // 水平居中
+		hintLabel.setLayoutY(screenHeight - 150); // 位于屏幕底部
+
+		root.getChildren().add(hintLabel);
+		// 调试输出
+		System.out.println("Hint Label added to root: " + root.getChildren().contains(hintLabel));
+		System.out.println("Hint Label Position: X=" + hintLabel.getLayoutX() + ", Y=" + hintLabel.getLayoutY());
 	}
 
 	public void cleanUp() {
