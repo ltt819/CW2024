@@ -1,7 +1,7 @@
 > GitHub：https://github.com/ltt819/CW2024.git
 
 - Directory Structure
-<img src="doc/image-1.png">
+<img src="src/main/resources/doc/image-1.png">
 
 - Class file description
 
