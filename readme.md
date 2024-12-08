@@ -41,7 +41,7 @@
 > 
  ```java
     /**
-     * 启动游戏界面
+     * Start game interface
      */
     public void startGame() {
         this.scene = new GameScene(stage, this);
